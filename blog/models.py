@@ -40,6 +40,8 @@ class Post(models.Model):
         return self.title
 
 
+# define comments model
+class Comments(models.Model):
 
 
 
