@@ -3,7 +3,8 @@ from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
 
 # Create your views here.
 from django.http import HttpResponse
-from .models import Post
+from .models import Post,Comment
+from .forms import CommentForm
 
 def index(request):
     return HttpResponse("you are at the blog index")
@@ -13,8 +14,28 @@ def index(request):
 #     return render(request,'blog/post/list.html',{'posts':posts})
 
 def post_detail(request,year,month,day,post):
-    post=get_object_or_404(Post,slug=post,publish__year=year,publish__month=month,publish__day=day,status='published')
-    return render(request,'blog/post/detail.html',{'post':post})
+    post=get_object_or_404(Post,
+                           slug=post,
+                           publish__year=year,
+                           publish__month=month,
+                           publish__day=day,
+                           status='published')
+    comments=post.post_comment.filter(active=True)
+    new_comment = None
+    if request.method == 'POST':
+        comment_from = CommentForm(data=request.POST)
+        if comment_from.is_valid():
+            new_comment = comment_from.save(commit=False)
+            new_comment.post = post
+            new_comment.save()
+    else:
+        comment_from = CommentForm()
+    return render(request,
+                  'blog/post/detail.html',
+                  {'post':post,
+                   'comments':comments,
+                   'new_comment':new_comment,
+                   'comment_form':comment_from})
 
 def post_list(request):
     object_list = Post.objects.all().filter(status='published')
@@ -50,7 +71,6 @@ def post_share(request,post_id):
             sent=True
     else:
         form=EmailPostForm()
-
     return render(request, 'blog/post/share.html', {'post':post, 'form':form, 'sent':sent, 'cd':cd})
 
 

@@ -15,6 +15,35 @@
         分享本文章
     </a>
     </p>
+
+    {% with comments.count as total_comments %}
+        <h4>本篇文章有{{ total_comments }}个评论</h4>
+    {% endwith %}
+
+    {% for comment in comments %}
+        <div class="comment">
+            <p class="info">
+                评论{{ forloop.counter }} 作者：{{ comment.name }} {{ comment.created }}
+            </p>
+            {{ comment.body |linebreaks}}
+        </div>
+     {% empty %}
+        <h4>
+            暂时还木有评论啦！
+        </h4>
+    {% endfor %}
+
+    {% if new_comment %}
+        <h2>您已成功评论</h2>
+     {% else %}
+        <h2>评论</h2>
+        <form action="." method="post">
+            {{ comment_form.as_p }}
+            {% csrf_token %}
+            <p><input type="submit" value="提交"></p>
+        </form>
+
+    {% endif %}
 {% endblock %}
 </body>
 </html>

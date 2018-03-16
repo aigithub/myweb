@@ -41,7 +41,21 @@ class Post(models.Model):
 
 
 # define comments model
-class Comments(models.Model):
+class Comment(models.Model):
+    post = models.ForeignKey(Post,related_name='post_comment',on_delete=models.CASCADE)
+    name = models.CharField(max_length= 30)
+    email = models.EmailField()
+    body = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ('created',)
+
+    def __str__(self):
+        return '这是{}对{}的评论'.format(self.name,self.post)
+
 
 
 
